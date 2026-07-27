@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # CPU-only torch keeps the job fast; the tests never need a GPU.
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install numpy pandas scikit-learn cma pytest
+
+      - name: Run test suite
+        run: pytest -v
+
+      - name: Verify the submission is reproducible from the committed logits
+        run: python scripts/rebuild_submission.py
+
+      - name: Recompute the ablation table
+        run: python scripts/ablation.py
+
+  notebooks:
+    name: Notebook health
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check notebooks are valid and render on GitHub
+        run: |
+          python - <<'PY'
+          import ast, glob, json, re, sys
+
+          MAGIC = re.compile(r"^\s*[%!].*$", re.M)
+          problems = []
+          for path in sorted(glob.glob("notebooks/**/*.ipynb", recursive=True)):
+              try:
+                  nb = json.load(open(path, encoding="utf-8"))
+              except Exception as exc:
+                  problems.append(f"{path}: not valid JSON ({exc})")
+                  continue
+
+              # GitHub refuses to render a notebook whose widget state is missing.
+              widgets = nb.get("metadata", {}).get("widgets")
+              if widgets:
+                  for name, value in widgets.items():
+                      if isinstance(value, dict) and "state" not in value:
+                          problems.append(f"{path}: metadata.widgets['{name}'] has no 'state'")
+
+              if nb.get("nbformat") != 4:
+                  problems.append(f"{path}: unexpected nbformat {nb.get('nbformat')}")
+
+              for i, cell in enumerate(nb.get("cells", [])):
+                  if cell.get("cell_type") not in ("code", "markdown", "raw"):
+                      problems.append(f"{path}: cell {i} has type {cell.get('cell_type')}")
+                  for out in cell.get("outputs", []) or []:
+                      if out.get("output_type") == "error":
+                          problems.append(f"{path}: cell {i} contains an error traceback")
+                  # Source must still be parseable Python once magics are masked:
+                  # this catches a cleanup pass that mangles code.
+                  if cell.get("cell_type") == "code":
+                      source = "".join(cell.get("source", []))
+                      try:
+                          ast.parse(MAGIC.sub("pass", source))
+                      except SyntaxError as exc:
+                          problems.append(f"{path}: cell {i} does not parse ({exc.msg}, line {exc.lineno})")
+
+          if problems:
+              print("\n".join(problems))
+              sys.exit(1)
+          print(f"All notebooks OK.")
+          PY
+
+      - name: Check no personal paths leaked into the notebooks
+        run: |
+          if grep -rlE "/gdrive|/content/drive" notebooks/; then
+            echo "A Google Drive path leaked into a notebook."
+            exit 1
+          fi
+          echo "No leaked paths."
