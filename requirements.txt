@@ -1,0 +1,13 @@
+# Core — enough to run scripts/rebuild_submission.py and scripts/ablation.py
+numpy>=1.24
+pandas>=2.0
+scikit-learn>=1.3
+
+# Training and hyperparameter search — needed only to re-run the notebooks
+torch>=2.1
+optuna>=3.4
+cma>=3.3
+matplotlib>=3.7
+seaborn>=0.13
+tensorboard>=2.14
+openpyxl>=3.1

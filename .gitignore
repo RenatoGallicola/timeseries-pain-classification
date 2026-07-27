@@ -1,0 +1,43 @@
+# --- Dataset (not redistributable, and over GitHub's file size limit) --------
+data/pirate_pain_*.csv
+data/pirate_pain_*.xlsx
+data/*_preprocessed_*.csv
+
+# --- Trained weights (see models/README.md) ----------------------------------
+*.pt
+*.pth
+*.ckpt
+
+# --- Training logs -----------------------------------------------------------
+runs/
+tensorboard/
+outcmaes/
+events.out.tfevents.*
+*.log
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+
+# --- Notebooks ---------------------------------------------------------------
+.ipynb_checkpoints/
+# Outputs are committed on purpose: they are the record of the submitted run.
+
+# --- Tooling / OS ------------------------------------------------------------
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Test / build caches -----------------------------------------------------
+.pytest_cache/
+.coverage
+htmlcov/

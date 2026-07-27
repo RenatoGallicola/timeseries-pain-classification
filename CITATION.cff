@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+title: "Pirate Pain — Multivariate Time-Series Classification"
+message: "If you refer to this work, please cite it as below."
+type: software
+authors:
+  - family-names: Zanoni
+    given-names: Alessandro
+  - family-names: Valentini
+    given-names: Jacopo
+  - family-names: Balducci
+    given-names: Arianna
+  - family-names: Gallicola
+    given-names: Renato
+version: "1.0.0"
+date-released: "2025-11-17"
+license: MIT
+abstract: >-
+  Solution to the first challenge of the Artificial Neural Networks and Deep
+  Learning course (Politecnico di Milano, A.Y. 2025/26): classifying the pain
+  level of a subject from 160 time steps of body-joint kinematics. The final
+  model is a CMA-ES-weighted ensemble of two CNN-GRU networks operating at
+  different temporal scales plus an InceptionTime network trained on an
+  enriched feature representation, refined by a confidence-gated binary
+  classifier. All networks are trained from scratch.
+keywords:
+  - time series classification
+  - deep learning
+  - ensemble methods
+  - PyTorch

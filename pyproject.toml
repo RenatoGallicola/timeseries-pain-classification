@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "timeseries-pain-classification"
+version = "1.0.0"
+description = "Multivariate time-series pain classification — AN2DL 2025/26 Challenge 1"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Alessandro Zanoni" },
+    { name = "Jacopo Valentini" },
+    { name = "Arianna Balducci" },
+    { name = "Renato Gallicola" },
+]
+keywords = ["time-series", "classification", "deep-learning", "pytorch", "ensemble"]
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scikit-learn>=1.3",
+]
+
+[project.optional-dependencies]
+train = ["torch>=2.1", "optuna>=3.4", "cma>=3.3", "matplotlib>=3.7",
+         "seaborn>=0.13", "tensorboard>=2.14", "openpyxl>=3.1"]
+dev = ["pytest>=7.4"]
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+filterwarnings = ["ignore::DeprecationWarning"]

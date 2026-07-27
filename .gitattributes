@@ -1,0 +1,18 @@
+# Normalise line endings so notebooks and code diff cleanly across platforms.
+* text=auto eol=lf
+
+# Notebooks are JSON: keep them LF and let GitHub render them.
+*.ipynb text eol=lf linguist-documentation=false
+
+# Binary artifacts — never touch these.
+*.npy binary
+*.pt binary
+*.pth binary
+*.pdf binary
+*.xlsx binary
+*.png binary
+
+# Keep the language statistics meaningful: the repo is a Python project whose
+# results happen to live in notebooks, not a "Jupyter Notebook" repo.
+*.ipynb linguist-detectable=true
+notebooks/experiments/* linguist-vendored=true
